@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { LayoutDashboard, Users, Settings, LogOut, Sun, Moon, Activity } from 'lucide-react';
 import Home from './pages/Home/Home';
-import Usuarios from './pages/Home/Usuarios/Usuarios';
+import Usuario from './pages/Home/Usuarios/Usuarios';
 
 function App() {
   const [theme, setTheme] = useState('light');
@@ -64,7 +64,7 @@ function App() {
           <main className="page-content">
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/usuarios" element={<Usuarios />} />
+              <Route path="/usuarios" element={<Usuario />} />
             </Routes>
           </main>
         </div>

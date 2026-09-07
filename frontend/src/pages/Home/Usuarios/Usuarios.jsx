@@ -1,29 +1,50 @@
 import { useState, useEffect } from 'react';
-import { getUsuarios } from '../../../services/usuarioService';
+import { UserPlus } from 'lucide-react';
+import { getUsuarios, createUsuario } from '../../../services/usuarioService';
+import ModalUsuario from '../../../components/ModalUsuario/ModalUsuario';
 
 function Usuarios() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const fetchUsuarios = async () => {
+    try {
+        setLoading(true);
+        const data = await getUsuarios();
+        
+        const listaUsuarios = Array.isArray(data) ? data : (data.data || []);
+        
+        setUsers(listaUsuarios);
+    } catch (err) {
+        setError(err.response?.data?.message || err.message || 'Erro ao buscar usuários');
+    } finally {
+        setLoading(false);
+    }
+};
 
     useEffect(() => {
-        const fetchUsuarios = async () => {
-            try {
-                const data = await getUsuarios();
-                setUsers(data.data || []);
-            } catch (err) {
-                setError(err.response?.data?.message || err.message || 'Erro ao buscar usuários');
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchUsuarios();
     }, []);
 
+    const handleCreateUser = async (formData) => {
+        await createUsuario(formData);
+        await fetchUsuarios();
+    };
+
     return (
         <div className="page-container">
-            <h1>Lista de Usuários</h1>
+            <div style={styles.headerArea}>
+                <h1>Lista de Usuários</h1>
+                <button 
+                    onClick={() => setIsModalOpen(true)} 
+                    style={styles.addButton}
+                >
+                    <UserPlus size={18} />
+                    Novo Usuário
+                </button>
+            </div>
 
             {loading && (<div style={styles.message}>Carregando...</div>)}
 
@@ -34,7 +55,7 @@ function Usuarios() {
                     {users.map((user) => (
                         <li key={user.id} style={styles.userCard}>
                             <div style={styles.userInfo}>
-                                <span style={styles.userName}>{user.name}</span>
+                                <span style={styles.userName}>{user.nome || user.name}</span>
                                 <span style={styles.userEmail}>{user.email}</span>
                             </div>
 
@@ -43,11 +64,39 @@ function Usuarios() {
                     ))}
                 </ul>
             )}
+
+            <ModalUsuario 
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onUserCreated={handleCreateUser}
+            />
         </div>
     );
 }
 
 const styles = {
+    headerArea: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '1.5rem',
+    },
+
+    addButton: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        background: 'var(--primary-color)',
+        color: '#ffffff',
+        border: 'none',
+        padding: '10px 18px',
+        borderRadius: '8px',
+        fontWeight: '600',
+        fontSize: '0.95rem',
+        cursor: 'pointer',
+        boxShadow: 'var(--shadow)',
+    },
+
     userList: {
         listStyleType: 'none',
         padding: 0,
