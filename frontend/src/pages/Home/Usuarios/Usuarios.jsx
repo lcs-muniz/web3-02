@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getUsuarios } from '../../services/usuarioService';
+import { getUsuarios } from '../../../services/usuarioService';
 
 function Usuarios() {
     const [users, setUsers] = useState([]);
@@ -37,7 +37,7 @@ function Usuarios() {
                                 <span style={styles.userName}>{user.name}</span>
                                 <span style={styles.userEmail}>{user.email}</span>
                             </div>
-                            
+
                             <div style={styles.statusBadge}>ID #{user.id}</div>
                         </li>
                     ))}
