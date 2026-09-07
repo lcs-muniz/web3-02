@@ -1,0 +1,1 @@
+## Este repositório tem como propósito unicamente a obtenção de nota da atividade 02 da disciplina de WEB 3, na qual foi desenvolvido um CRUD  para gerenciamento de usuários utilizando React e Node.js.
