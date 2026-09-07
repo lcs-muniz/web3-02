@@ -1,11 +1,24 @@
-import { useState } from 'react';
-import { X, UserPlus, Mail, Lock, User } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, UserPlus, UserCheck, Mail, Lock, User } from 'lucide-react';
 import './ModalUsuario.css';
 
-function ModalUsuario({ isOpen, onClose, onUserCreated }) {
+function ModalUsuario({ isOpen, onClose, onSave, usuarioEditando }) {
   const [formData, setFormData] = useState({ nome: '', email: '', senha: '' });
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    if (usuarioEditando) {
+      setFormData({
+        nome: usuarioEditando.nome || usuarioEditando.name || '',
+        email: usuarioEditando.email || '',
+        senha: ''
+      });
+    } else {
+      setFormData({ nome: '', email: '', senha: '' });
+    }
+    setErrorMessage('');
+  }, [usuarioEditando, isOpen]);
 
   if (!isOpen) return null;
 
@@ -19,23 +32,28 @@ function ModalUsuario({ isOpen, onClose, onUserCreated }) {
     setErrorMessage('');
 
     try {
-      await onUserCreated(formData);
-      setFormData({ nome: '', email: '', senha: '' });
+      await onSave(formData);
       onClose();
     } catch (err) {
-      setErrorMessage(err.response?.data?.detalhe || err.message || 'Erro ao cadastrar usuário.');
+      setErrorMessage(err.response?.data?.detalhe || err.response?.data?.erro || err.message || 'Erro ao salvar usuário.');
     } finally {
       setSubmitting(false);
     }
   };
+
+  const isEditing = Boolean(usuarioEditando);
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-container" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <div className="modal-title">
-            <UserPlus size={20} color="var(--primary-color)" />
-            <h2>Novo Usuário</h2>
+            {isEditing ? (
+              <UserCheck size={20} color="var(--primary-color)" />
+            ) : (
+              <UserPlus size={20} color="var(--primary-color)" />
+            )}
+            <h2>{isEditing ? 'Editar Usuário' : 'Novo Usuário'}</h2>
           </div>
           <button className="modal-close-btn" onClick={onClose}>
             <X size={20} />
@@ -78,7 +96,7 @@ function ModalUsuario({ isOpen, onClose, onUserCreated }) {
           </div>
 
           <div className="form-group">
-            <label htmlFor="senha">Senha</label>
+            <label htmlFor="senha">{isEditing ? 'Nova Senha (Opcional)' : 'Senha'}</label>
             <div className="input-icon-wrapper">
               <Lock size={18} className="input-icon" />
               <input
@@ -88,7 +106,7 @@ function ModalUsuario({ isOpen, onClose, onUserCreated }) {
                 placeholder="••••••••"
                 value={formData.senha}
                 onChange={handleChange}
-                required
+                required={!isEditing}
               />
             </div>
           </div>
@@ -98,7 +116,7 @@ function ModalUsuario({ isOpen, onClose, onUserCreated }) {
               Cancelar
             </button>
             <button type="submit" className="btn-primary" disabled={submitting}>
-              {submitting ? 'Cadastrando...' : 'Salvar Usuário'}
+              {submitting ? 'Salvando...' : isEditing ? 'Atualizar' : 'Salvar Usuário'}
             </button>
           </div>
         </form>
