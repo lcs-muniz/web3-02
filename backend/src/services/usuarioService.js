@@ -6,14 +6,36 @@ const obterTodosUsuarios = async => {
 
 const criarUsuario = async (dados) => {
     const novoUsuario = await Usuario.create(dados);
-    const usuarioSemSenha = novoUsuario.toJSON();
-    delete usuarioSemSenha.senha;
-    
-    return usuarioSemSenha;
+    return novoUsuario;
 };
+
+const removerUsuario = async (id) => {
+    const usuario = await Usuario.findByPk(id);
+    if (!usuario) {
+        return null;
+    }
+    await usuario.destroy();
+    return usuario;
+};
+
+const buscarUsuarioPorId = async (id) => {
+    const usuario = await Usuario.findByPk(id);
+    return usuario;
+};
+
+const atualizarUsuario = async (id, dadosAtualizados) => {
+    const usuario = await Usuario.findByPk(id);
+    if (!usuario) {
+        return null;
+    }
+    await usuario.update(dadosAtualizados);
+    return usuario;
+}
 
 module.exports = { 
     obterTodosUsuarios,
     criarUsuario,
-    removerUsuario
+    removerUsuario,
+    buscarUsuarioPorId,
+    atualizarUsuario
 };

@@ -35,6 +35,7 @@ Usuario.init(
     modelName: 'Usuario',
     tableName: 'usuarios',
     timestamps: true,
+    paranoid: true,
     hooks: {
       beforeSave: async (usuario) => {
         if (usuario.changed('senha')) {

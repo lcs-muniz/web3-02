@@ -23,6 +23,7 @@ const sequelize = new Sequelize(
 const conectarBanco = async () => {
   try {
     await sequelize.authenticate();
+    //await sequelize.sync({ alter: true }); (utilizar só pra atualizar as tabelas automaticamente msm)
     console.log("✅ Conectado ao banco de dados com sucesso!");
   } catch (error) {
     console.error("❌ Erro ao conectar com o banco de dados:", error);
