@@ -1,12 +1,12 @@
 const Usuario = require('../models/Usuario');
 
-const obterTodosUsuarios = async => {
+const obterTodosUsuarios = async () => {
     return Usuario.findAll();
 };
 
 const criarUsuario = async (dados) => {
     const novoUsuario = await Usuario.create(dados);
-    return novoUsuario;
+    return await novoUsuario.reload();
 };
 
 const removerUsuario = async (id) => {
@@ -25,12 +25,16 @@ const buscarUsuarioPorId = async (id) => {
 
 const atualizarUsuario = async (id, dadosAtualizados) => {
     const usuario = await Usuario.findByPk(id);
-    if (!usuario) {
-        return null;
-    }
+
+    dadosAtualizados.senha?.trim()
+        ? (dadosAtualizados.senha = dadosAtualizados.senha.trim()) 
+        : delete dadosAtualizados.senha;
+
+    if (!usuario) return null;
+
     await usuario.update(dadosAtualizados);
-    return usuario;
-}
+    return await usuario.reload();
+};
 
 module.exports = { 
     obterTodosUsuarios,

@@ -1,6 +1,6 @@
 const { DataTypes, Model } = require('sequelize');
-const bcrypt = require('bcrypt');
 const { sequelize } = require('../instances/mysql');
+const { gerarHashSenha } = require('../utils/authUtils');
 
 class Usuario extends Model {}
 
@@ -36,15 +36,16 @@ Usuario.init(
     tableName: 'usuarios',
     timestamps: true,
     paranoid: true,
+    defaultScope: {
+      attributes: { exclude: ['senha'] }
+    },
     hooks: {
       beforeSave: async (usuario) => {
-        if (usuario.changed('senha')) {
-          const salt = await bcrypt.genSalt(10);
-          usuario.senha = await bcrypt.hash(usuario.senha, salt);
-        }
+        if (usuario.changed('senha') && usuario.senha) {
+          usuario.senha = await gerarHashSenha(usuario.senha);
       }
     }
   }
-);
+});
 
 module.exports = Usuario;
